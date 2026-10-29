@@ -34,7 +34,14 @@ jobs:
         env:
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
         run: |
+          set -eu
+          test -n "$GITLAB_TOKEN" || {
+            echo "GITLAB_TOKEN secret is missing or empty"
+            exit 1
+          }
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git remote add gitlab https://gitlab.com/gitlab-devops-project1/github-gitlab-cicd-project.git
-          git -c http.extraHeader="Authorization: Bearer ${GITLAB_TOKEN}" push gitlab HEAD:main
+          AUTH=$(printf 'oauth2:%s' "$GITLAB_TOKEN" | base64 -w 0)
+          git -c http.extraHeader="Authorization: Basic $AUTH" push gitlab HEAD:main
+
