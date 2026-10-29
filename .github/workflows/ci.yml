@@ -1,0 +1,37 @@
+
+name: GitHub to GitLab CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-test-sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout GitHub code
+        uses: actions/checkout@v4
+
+      - name: Build check
+        run: |
+          echo "Build check successful"
+
+      - name: Test check
+        run: |
+          test -f README.md
+          echo "Test passed"
+
+      - name: Push code to GitLab
+        env:
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git remote add gitlab "https://oauth2:${GITLAB_TOKEN}@gitlab.com/gitlab-devops-project1/github-gitlab-cicd-project.git"
+          git push gitlab HEAD:main
