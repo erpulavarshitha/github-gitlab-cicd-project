@@ -20,12 +20,15 @@ jobs:
 
       - name: Build check
         run: |
+          echo "Build check started"
+          test -f README.md
+          test -f index.html
           echo "Build check successful"
 
       - name: Test check
         run: |
-          test -f README.md
-          echo "Test passed"
+          grep -q "github-gitlab-cicd-project" README.md
+          echo "Test passed successfully"
 
       - name: Push code to GitLab
         env:
@@ -33,5 +36,5 @@ jobs:
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git remote add gitlab "https://oauth2:${GITLAB_TOKEN}@gitlab.com/gitlab-devops-project1/github-gitlab-cicd-project.git"
-          git push gitlab HEAD:main
+          git remote add gitlab https://gitlab.com/gitlab-devops-project1/github-gitlab-cicd-project.git
+          git -c http.extraHeader="Authorization: Bearer ${GITLAB_TOKEN}" push gitlab HEAD:main
